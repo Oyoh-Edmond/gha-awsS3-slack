@@ -19,7 +19,6 @@ jobs:
       id: echo_contents
       run: |
         content=$(cat ${{ github.event.inputs.filename }})
-        echo "::set-output name=content::$content"
         echo "$content"
 
   notify_slack:
@@ -36,7 +35,7 @@ jobs:
         payload: >
           {
             "username": "Edmond & Jide",
-            "text":   echo "${{ steps.echo_contents.outputs.content }}"
+            "text": "$content"
           }
 
   convert_to_json:
@@ -50,8 +49,6 @@ jobs:
     - name: Convert text file to JSON
       id: json_convert
       run: |
-
-        content=$(cat ${{ needs.echo_file.outputs.file_content }})
         json_output=$(jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}'  <<< "$content")
         echo "::set-output name=json_content::$json_output"
 
