@@ -25,7 +25,7 @@ jobs:
           run: |
                 content=$(cat ${{ github.event.inputs.filename }})
                 echo "$content"
-                echo "::set-output name=output::$content"
+                echo "::set-output name=file_content::$content"
         - name: Notify Slack on Job's Success
           if: ${{ success() }}
           uses: wearerequired/slack-messaging-action@v1
