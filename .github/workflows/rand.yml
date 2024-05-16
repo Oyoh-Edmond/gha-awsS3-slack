@@ -3,7 +3,7 @@ name: Random numbers
 on:
   workflow_dispatch:
     inputs:
-      filename:
+      filename:  # You need to define the input for the filename
         description: 'File to display'
         required: true
         default: 'rand.txt'
@@ -11,25 +11,24 @@ on:
 jobs:
   echo_file:
     runs-on: ubuntu-latest
+    outputs:
+      file_content: ${{ steps.echo_contents.outputs.content }}  # Define output for use in another job
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
   
     - name: Display file contents
-      run: cat ${{ github.event.inputs.filename }}
-      id: echo_contents
-      continue-on-error: true  # Continue even if cat command fails
+      id: echo_contents  # You need an ID to refer to step outputs
+      run: |
+        content=$(cat ${{ github.event.inputs.filename }})
+        echo "::set-output name=content::$content"  # Set the output variable correctly
+        
 
   notify_slack:
     runs-on: ubuntu-latest
     needs: [echo_file]
     if: always()  # Notify Slack even if previous steps fail
     steps:
-    - name: Store the output in a variable
-      run: |
-        content=$(cat ${{ github.event.inputs.filename }})
-        echo "::set-output name=output::$content"
-
     - name: Notify Slack on Job's Success
       if: success()  # Notify Slack only if previous steps succeed
       uses: wearerequired/slack-messaging-action@v1
@@ -39,5 +38,5 @@ jobs:
         payload: >
           {
             "username": "Edmond & Jide",
-            "text": "Contents of ${{ github.event.inputs.filename }}: ${{ needs.echo_file.outputs.output }}"
+            "text": "Contents of ${{ github.event.inputs.filename }}: ${{ needs.echo_file.outputs.file_content }}"
           }
