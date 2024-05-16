@@ -1,37 +1,43 @@
-name: Echo Random Numbers
+name: Random numbers
 
 on:
   workflow_dispatch:
-    inputs: 
-        filename:
-            description: 'File to display'
-            required: true
-            default: 'rand.txt'
-
+    inputs:
+      filename:
+        description: 'File to display'
+        required: true
+        default: 'rand.txt'
+    
 jobs:
-  read_numbers:
+  echo_file:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
-    - name: Read file and store content in a variable
-      id: read_file
-      run: |
-        content=$(cat ${{ github.event.inputs }})
-        echo "::set-output name=file_content::$content"
+  
+    - name: Display file contents
+      run: cat ${{ github.event.inputs.filename }}
+      id: echo_contents
+      continue-on-error: true  # Continue even if cat command fails
 
   notify_slack:
     runs-on: ubuntu-latest
-    needs: [read_numbers]  # Wait for read_numbers job to complete
+    needs: [echo_file]
+    if: always()  # Notify Slack even if previous steps fail
     steps:
-    - name: Send content to Slack
-      if: success()  # Send notification only if read_numbers job succeeds
+    - name: Store the output in a variable
+      run: |
+        content=$(cat ${{ github.event.inputs.filename }})
+        echo "::set-output name=output::$content"
+
+    - name: Notify Slack on Job's Success
+      if: success()  # Notify Slack only if previous steps succeed
       uses: wearerequired/slack-messaging-action@v1
       with:
         bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-        channel: your_slack_channel  # Replace with your Slack channel
+        channel: githubactions 
         payload: >
           {
-            "text": "Contents of rand.txt: ${{ needs.read_numbers.outputs.file_content }}"
+            "username": "Edmond & Jide",
+            "text": "Contents of ${{ github.event.inputs.filename }}: ${{ needs.echo_file.outputs.output }}"
           }
