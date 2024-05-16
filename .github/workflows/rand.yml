@@ -51,7 +51,7 @@ jobs:
     - name: Convert text file to JSON
       id: json_convert
       run: |
-          json=$(jq -R -s -c 'split("\n")[:-1] | map({("item"+(tostring)): .}) | add' ${{ github.event.inputs.filename }}) || echo "conversion failed")
+          json=$(jq -R -s -c 'split("\n")[:-1] | map({("item"+(tostring)): .}) | add' ${{ github.event.inputs.filename }} || echo "conversion failed")
           echo "::set-output name=json_content::$json"
     
     - name: Notify Slack on Job's Success
