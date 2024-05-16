@@ -20,7 +20,7 @@ jobs:
       run: |
         content=$(cat ${{ github.event.inputs.filename }})
         echo "::set-output name=content::$content"
-        echo "Content of ${{ github.event.inputs.filename }}: $content"
+        echo "$content"
 
   notify_slack:
     runs-on: ubuntu-latest
