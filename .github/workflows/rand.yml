@@ -53,6 +53,7 @@ jobs:
       id: json_convert
       run: |
           json=$(jq -R -s -c 'split("\n")[:-1] | map({("item"+(tostring)): .}) | add' rand.txt)
+          echo "json"
           echo "::set-output name=json_content::$json"
     
     - name: Notify Slack on Job's Success
