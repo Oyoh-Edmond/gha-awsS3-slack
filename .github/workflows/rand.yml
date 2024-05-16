@@ -20,12 +20,14 @@ jobs:
 
     notify_slack:
         runs-on: ubuntu-latest
+        needs: [echo_file]
         steps:
         - name: Store the output in a variable
           run: |
                 content=$(cat ${{ github.event.inputs.filename }})
                 echo "$content"
                 echo "::set-output name=file_content::$content"
+                
         - name: Notify Slack on Job's Success
           if: ${{ success() }}
           uses: wearerequired/slack-messaging-action@v1
