@@ -3,7 +3,7 @@ name: Random numbers
 on:
   workflow_dispatch:
     inputs:
-      filename:  # You need to define the input for the filename
+      filename:
         description: 'File to display'
         required: true
         default: 'rand.txt'
@@ -12,29 +12,28 @@ jobs:
   echo_file:
     runs-on: ubuntu-latest
     outputs:
-      file_content: ${{ steps.echo_contents.outputs.content }}  # Define output for use in another job
+      file_content: ${{ steps.echo_contents.outputs.content }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
   
     - name: Display file contents
-      id: echo_contents  # You need an ID to refer to step outputs
+      id: echo_contents
       run: |
         content=$(cat ${{ github.event.inputs.filename }})
-        echo "::set-output name=content::$content"  # Set the output variable correctly
-        
+        echo "::set-output name=content::$content"
 
   notify_slack:
     runs-on: ubuntu-latest
-    needs: [echo_file]
-    if: always()  # Notify Slack even if previous steps fail
+    needs: echo_file
+    if: always()
     steps:
     - name: Notify Slack on Job's Success
-      if: success()  # Notify Slack only if previous steps succeed
+      if: success()
       uses: wearerequired/slack-messaging-action@v1
       with:
         bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-        channel: githubactions 
+        channel: 'githubactions'
         payload: >
           {
             "username": "Edmond & Jide",
@@ -43,7 +42,7 @@ jobs:
 
   convert_to_json:
     runs-on: ubuntu-latest
-    needs: [echo_file]
+    needs: echo_file
     if: always()
     steps:
     - name: Install jq
@@ -52,23 +51,22 @@ jobs:
     - name: Convert text file to JSON
       id: json_convert
       run: |
-          json=$(jq -R -s -c 'split("\n")[:-1] | map({("item"+(tostring)): .}) | add' rand.txt)
-          echo "json"
+          json=$(jq -R -s -c 'split("\n")[:-1] | map({("item"+(tostring)): .}) | add' ${{ github.event.inputs.filename }})
           echo "::set-output name=json_content::$json"
     
     - name: Notify Slack on Job's Success
-      if: success()  # Notify Slack only if previous steps succeed
+      if: success()
       uses: wearerequired/slack-messaging-action@v1
       with:
-            bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-            channel: githubactions 
-            payload: >
-                {
-                    "username": "Edmond & Jide",
-                    "text": "Contents of ${{ github.event.inputs.filename }}:",
-                    "attachments": [
-                        {
-                            "text": "$(cat formatted_content.json)"
-                        }
-                    ]
-                }
+        bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
+        channel: 'githubactions'
+        payload: >
+          {
+            "username": "Edmond & Jide",
+            "text": "JSON content of ${{ github.event.inputs.filename }}:",
+            "attachments": [
+              {
+                "text": "${{ steps.json_convert.outputs.json_content }}"
+              }
+            ]
+          }
