@@ -11,8 +11,6 @@ on:
 jobs:
   echo_file:
     runs-on: ubuntu-latest
-    outputs:
-      content: ${{ steps.echo_contents.outputs.content }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -22,22 +20,15 @@ jobs:
       run: |
         content=$(cat "${{ github.event.inputs.filename }}")
         echo "$content"
-        echo "content<<EOF" >> $GITHUB_ENV
-        echo "$content" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-      env:
-        GITHUB_ENV: ${{ runner.temp }}/github_env
+        echo "::set-output name=content::$content"
 
     - name: Set content output
-      run: echo "content=${{ env.content }}" >> $GITHUB_ENV
-      env:
-        GITHUB_ENV: ${{ runner.temp }}/github_env
-    outputs:
-      content: ${{ env.content }}
+      run: echo "content=${{ steps.echo_contents.outputs.content }}" >> $GITHUB_ENV
 
   notify_slack:
     runs-on: ubuntu-latest
     needs: [echo_file]
+    if: always()
     steps:
     - name: Notify Slack on Job's Success
       if: success()
@@ -54,8 +45,7 @@ jobs:
   convert_to_json:
     runs-on: ubuntu-latest
     needs: [echo_file]
-    outputs:
-      json_output: ${{ steps.convert_json.outputs.json_output }}
+    if: always()
     steps:
     - name: Install jq
       run: sudo apt-get update && sudo apt-get install -y jq
@@ -64,13 +54,7 @@ jobs:
       id: convert_json
       run: |
         json_output=$(echo "${{ needs.echo_file.outputs.content }}" | jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}')
-        echo "json_output<<EOF" >> $GITHUB_ENV
-        echo "$json_output" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-      env:
-        GITHUB_ENV: ${{ runner.temp }}/github_env
-     outputs:
-      json_output: ${{ env.json_output }}
+        echo "::set-output name=json_output::$json_output"
 
     - name: Notify Slack with JSON
       if: success()
@@ -81,5 +65,5 @@ jobs:
         payload: |
           {
             "username": "Edmond & Jide",
-            "text": "${{ needs.convert_to_json.outputs.json_output }}"
+            "text": "${{ steps.convert_json.outputs.json_output }}"
           }
