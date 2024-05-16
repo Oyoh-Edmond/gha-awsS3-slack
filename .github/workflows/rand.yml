@@ -51,8 +51,9 @@ jobs:
     - name: Convert text file to JSON
       id: json_convert
       run: |
-        content=$(cat ${{ github.event.inputs.filename }})
-        json_output=$(jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}' rand.txt)
+
+        content=$(cat ${{ needs.echo_file.outputs.file_content }})
+        json_output=$(jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}'  <<< "$content")
         echo "::set-output name=json_content::$json_output"
 
     
