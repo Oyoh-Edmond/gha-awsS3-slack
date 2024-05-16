@@ -11,8 +11,6 @@ on:
 jobs:
   echo_file:
     runs-on: ubuntu-latest
-    outputs:
-      file_content: ${{ steps.echo_contents.outputs.content }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -22,6 +20,7 @@ jobs:
       run: |
         content=$(cat ${{ github.event.inputs.filename }})
         echo "::set-output name=content::$content"
+        echo "Content of letters.txt: ${{ steps.echo_contents.outputs.content }}"    
 
   notify_slack:
     runs-on: ubuntu-latest
