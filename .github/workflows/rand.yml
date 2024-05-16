@@ -11,59 +11,16 @@ on:
 jobs:
   echo_file:
     runs-on: ubuntu-latest
+    outputs:
+      file_content: ${{ steps.set_var.outputs.file_content }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Display file contents
-      id: echo_contents
-      run: |
-        content=$(cat "${{ github.event.inputs.filename }}")
-        echo "$content"
-        echo "::set-output name=content::$content"
+    - name: Read file contents
+      id: read_file
+      run: echo "file_content=$(cat ${{ github.event.inputs.filename }})" >> $GITHUB_ENV
 
-    - name: Set content output
-      run: echo "content=${{ steps.echo_contents.outputs.content }}" >> $GITHUB_ENV
-
-  notify_slack:
-    runs-on: ubuntu-latest
-    needs: [echo_file]
-    if: always()
-    steps:
-    - name: Notify Slack on Job's Success
-      if: success()
-      uses: wearerequired/slack-messaging-action@v1
-      with:
-        bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-        channel: 'gha_interns'
-        payload: |
-          {
-            "username": "Edmond & Jide",
-            "text": "${{ needs.echo_file.outputs.content }}"
-          }
-
-  convert_to_json:
-    runs-on: ubuntu-latest
-    needs: [echo_file]
-    if: always()
-    steps:
-    - name: Install jq
-      run: sudo apt-get update && sudo apt-get install -y jq
-
-    - name: Convert to JSON
-      id: convert_json
-      run: |
-        json_output=$(echo "${{ needs.echo_file.outputs.content }}" | jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}')
-        echo "::set-output name=json_output::$json_output"
-
-    - name: Notify Slack with JSON
-      if: success()
-      uses: wearerequired/slack-messaging-action@v1
-      with:
-        bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-        channel: 'gha_interns'
-        payload: |
-          {
-            "username": "Edmond & Jide",
-            "text": "${{ steps.convert_json.outputs.json_output }}"
-          }
+    - name: Set variable
+      id: set_var
+      run: echo "::set-output name=file_content::$(echo $file_content)"
