@@ -9,7 +9,7 @@ on:
                 default: 'rand.txt'
     
 jobs:
-    display_file:
+    echo_file:
       runs-on: ubuntu-latest
       steps:
       - name: Checkout repository
@@ -17,3 +17,12 @@ jobs:
   
       - name: Display file contents
         run: cat ${{ github.event.inputs.filename }}
+
+    output-slack:    
+        runs-on: ubuntu-latest
+        steps:
+        - name: Store the output in a variable
+          run: |
+            content=$(cat ${{ github.event.inputs.filename }})
+            echo "$content"
+            echo "::set-output name=output::$content"
