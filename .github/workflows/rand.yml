@@ -7,7 +7,7 @@ on:
         description: 'File to display'
         required: true
         default: 'rand.txt'
-    
+
 jobs:
   echo_file:
     runs-on: ubuntu-latest
@@ -18,8 +18,13 @@ jobs:
     - name: Display file contents
       id: echo_contents
       run: |
-        content=$(cat ${{ github.event.inputs.filename }})
+        content=$(cat "${{ github.event.inputs.filename }}")
         echo "$content"
+      env:
+        content: ${{ github.event.inputs.filename }}
+        
+    - name: Set content output
+      run: echo "content=${content}" >> $GITHUB_ENV
 
   notify_slack:
     runs-on: ubuntu-latest
@@ -32,10 +37,10 @@ jobs:
       with:
         bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
         channel: 'gha_interns'
-        payload: >
+        payload: |
           {
             "username": "Edmond & Jide",
-            "text": "$content"
+            "text": "${{ env.content }}"
           }
 
   convert_to_json:
@@ -44,22 +49,22 @@ jobs:
     if: always()
     steps:
     - name: Install jq
-      run: sudo apt-get install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
   
-    - name: Display file contents and convert to JSON
+    - name: Convert to JSON
+      id: convert_json
       run: |
-        echo "$content"
-        json_output=$(echo "$content" | jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}')
-        echo "JSON Output: $json_output"
+        json_output=$(echo "${{ env.content }}" | jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}')
+        echo "json_output=${json_output}" >> $GITHUB_ENV
 
-    - name: Notify Slack on Job's Success
+    - name: Notify Slack with JSON
       if: success()
       uses: wearerequired/slack-messaging-action@v1
       with:
         bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
         channel: 'gha_interns'
-        payload: >
+        payload: |
           {
             "username": "Edmond & Jide",
-            "text": "$json_output"
+            "text": "${{ env.json_output }}"
           }
