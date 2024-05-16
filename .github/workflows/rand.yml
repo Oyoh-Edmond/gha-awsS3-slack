@@ -20,7 +20,7 @@ jobs:
       run: |
         content=$(cat ${{ github.event.inputs.filename }})
         echo "::set-output name=content::$content"
-        echo "Content of letters.txt: ${{ steps.echo_contents.outputs.content }}"    
+        echo "${{ steps.echo_contents.outputs.content }}"
 
   notify_slack:
     runs-on: ubuntu-latest
