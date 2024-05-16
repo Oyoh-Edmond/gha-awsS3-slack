@@ -52,8 +52,8 @@ jobs:
       id: json_convert
       run: |
         content=$(cat ${{ github.event.inputs.filename }})
-        json=$(echo "$content" | jq -Rn '{ items: [inputs | split("\n") | .[] | select(. != "")] }')
-        echo "::set-output name=json_content::$json"
+        json_output=$(jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}' rand.txt)
+        echo "::set-output name=json_content::$json_output"
 
     
     - name: Notify Slack on Job's Success
