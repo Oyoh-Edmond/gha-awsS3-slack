@@ -20,11 +20,9 @@ jobs:
       run: |
         content=$(cat "${{ github.event.inputs.filename }}")
         echo "$content"
-      env:
-        content: ${{ github.event.inputs.filename }}
-        
-    - name: Set content output
-      run: echo "content=${content}" >> $GITHUB_ENV
+        echo "content<<EOF" >> $GITHUB_ENV
+        echo "$content" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
 
   notify_slack:
     runs-on: ubuntu-latest
