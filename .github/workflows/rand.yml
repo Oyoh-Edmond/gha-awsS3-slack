@@ -33,7 +33,7 @@ jobs:
       uses: wearerequired/slack-messaging-action@v1
       with:
         bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-        channel: 'githubactions'
+        channel: 'Gha_interns'
         payload: >
           {
             "username": "Edmond & Jide",
@@ -51,15 +51,17 @@ jobs:
     - name: Convert text file to JSON
       id: json_convert
       run: |
-          json=$(jq -R -s -c 'split("\n")[:-1] | map({("item"+(tostring)): .}) | add' ${{ github.event.inputs.filename }} || echo "conversion failed")
-          echo "::set-output name=json_content::$json"
+        content=$(cat ${{ github.event.inputs.filename }})
+        json=$(echo "$content" | jq -Rn '{ items: [inputs | split("\n") | .[] | select(. != "")] }')
+        echo "::set-output name=json_content::$json"
+
     
     - name: Notify Slack on Job's Success
       if: success()
       uses: wearerequired/slack-messaging-action@v1
       with:
         bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-        channel: 'githubactions'
+        channel: 'Gha_interns'
         payload: >
           {
             "username": "Edmond & Jide",
