@@ -50,7 +50,7 @@ jobs:
       id: json_convert
       run: |
         json_output=$(jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}'  <<< "$content")
-        echo "::set-output name=json_content::$json_output"
+        echo "$json_output"
 
     
     - name: Notify Slack on Job's Success
