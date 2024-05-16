@@ -14,15 +14,16 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-  
+
     - name: Display file contents
       id: echo_contents
       run: |
         content=$(cat "${{ github.event.inputs.filename }}")
         echo "$content"
-        echo "content<<EOF" >> $GITHUB_ENV
-        echo "$content" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
+        echo "::set-output name=content::$content"
+
+    - name: Set content output
+      run: echo "content=${{ steps.echo_contents.outputs.content }}" >> $GITHUB_ENV
 
   notify_slack:
     runs-on: ubuntu-latest
@@ -38,7 +39,7 @@ jobs:
         payload: |
           {
             "username": "Edmond & Jide",
-            "text": "${{ env.content }}"
+            "text": "${{ needs.echo_file.outputs.content }}"
           }
 
   convert_to_json:
@@ -48,12 +49,12 @@ jobs:
     steps:
     - name: Install jq
       run: sudo apt-get update && sudo apt-get install -y jq
-  
+
     - name: Convert to JSON
       id: convert_json
       run: |
-        json_output=$(echo "${{ env.content }}" | jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}')
-        echo "json_output=${json_output}" >> $GITHUB_ENV
+        json_output=$(echo "${{ needs.echo_file.outputs.content }}" | jq -Rs '{items: split("\n")[:-1] | to_entries | map({("item" + (.key + 1 | tostring)): .value}) | add}')
+        echo "::set-output name=json_output::$json_output"
 
     - name: Notify Slack with JSON
       if: success()
@@ -64,5 +65,5 @@ jobs:
         payload: |
           {
             "username": "Edmond & Jide",
-            "text": "${{ env.json_output }}"
+            "text": "${{ steps.convert_json.outputs.json_output }}"
           }
