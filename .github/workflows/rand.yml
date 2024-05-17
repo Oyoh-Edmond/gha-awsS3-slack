@@ -20,8 +20,9 @@ jobs:
       - name: Read and echo file content
         id: readfile
         run: |
-          content=$(cat ${{ github.event.inputs.filename }})
-          echo "::set-output name=content::$content"
+          content=$(awk '{print "\""$0"\""}' ${{ github.event.inputs.filename }} | paste -sd, -)
+          echo "{\"codes\":[$content]}" > codes.json
+          echo "::set-output name=content::$(cat codes.json)"
 
   notify-slack:
     runs-on: ubuntu-latest
@@ -31,10 +32,6 @@ jobs:
       - name: Send notification to Slack
         uses: slackapi/slack-github-action@v1.26.0
         with:
-        env:    
-            SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-         channel: gha_interns 
-         payload: >-
-            {
-                "text": "File processed: ${{ needs.process-file.outputs.file-content }}"
-            }      
+         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+         channel: '#gha_interns'
+            text: "File processed: ${{ needs.process-file.outputs.file-content }}"
