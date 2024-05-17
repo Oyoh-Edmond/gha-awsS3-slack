@@ -12,8 +12,8 @@ jobs:
 
   echo-file-content:
     runs-on: ubuntu-latest
-    outputs:
-      file-content: ${{ steps.echofile.outputs.content }}
+    # outputs:
+    #   file-content: ${{ steps.echofile.outputs.content }}
 
     steps:
      - name: Checkout repository
@@ -36,7 +36,7 @@ jobs:
                   {
                    
                     "username": "Deployer",
-                    "text":"${{steps.echofile.outputs.content}}"
+                    "text":"$content"
                   }
        
 
