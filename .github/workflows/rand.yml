@@ -32,6 +32,7 @@ jobs:
         if: ${{success()}}
         uses: slackapi/slack-github-action@v1.26.0
         with:
+        env:    
             SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
          channel: gha_interns 
          payload: >-
