@@ -3,74 +3,65 @@ name: Process File and Notify Slack with Bot Token
 on: [push]
 
 jobs:
-
   echo-file-content:
     runs-on: ubuntu-latest
 
     steps:
-     - name: Checkout repository
-       uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-     - name: Echo file content
-       id: echofile
-       run: |
-            Letter=$(cat << EOF 
-            1. JKezNpJYDWiUsCZ
-            2. NyMPzTBgWCKmULa
-            3. LQsZjHxJYpJmLCW
-            4. BKrEYxRjHmLQpVG
-            5. CqFmUzBVjHxLpQs
-            6. TBAxDzFWJKyLpMU
-            7. MLzBTfVzWNqLAZx
-            8. kDqHLMzNxJYpJgW
-            9. YzBfCLzMjHqLPRw
-            10. ZVYKzNfQxRBMLaP
-            11. RqCwJXzEPLMqRkB
-            12. LpJzFQxMnJjKzCZ
-            13. ZTqCJzLwFMPxBfN
-            14. dHSRLxJYpJhCzVB
-            15. WmJxZKuNfSxLQzV
-            16. AxRDzVwFPnQkMzB
-            17. CxJkLsGzBrHcNqF
-            18. LPnJzFtRZwCkTyM
-            19. jLgVxJYpCqFwTWU
-            20. KzNRxCbWBzHjRfP
-            21. TzJxLsZKuMnJzG
-            22. ByRCLxJYpJmLzQs
-            23. NzBfCxMnJzFwLQz
-            24. JzXuMnJzFwLPqFx
-            25. RxJYpJmLCzVBgFW
-            26. PkJKzNrCLxJYpJM
-            27. YzBXzBRwPmJzTQs
-            28. xJKzNpJYDWiUsCZ
-            29. CzFPnQkMzBxJKzN
-            30. PnJzFwLPqFXzBfC
-            EOF
-            )   
-            echo "Letter<<EOF" >> $GITHUB_ENV
-            echo "$Letter" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV    
+      - name: Echo file content
         id: my_string
-     - name: display string
-       run: |
-       echo "The string is: ${{ env.Letter }}"
-    
-            
-     - name: display string
-       run: |
-          echo "Item: ${{ env.content }}"
-        
-     - name: Notify Slack on Job's Success
-       if: ${{ success() }}
-       uses: wearerequired/slack-messaging-action@v1
-       with:
-                bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-                channel: gha_interns 
-                payload: >-
-                  {
-                   
-                    "username": "Deployer",
-                    "text":"${{env.Letter}}"
-                  }
-       
+        run: |
+          Letter=$(cat <<EOF
+          1. JKezNpJYDWiUsCZ
+          2. NyMPzTBgWCKmULa
+          3. LQsZjHxJYpJmLCW
+          4. BKrEYxRjHmLQpVG
+          5. CqFmUzBVjHxLpQs
+          6. TBAxDzFWJKyLpMU
+          7. MLzBTfVzWNqLAZx
+          8. kDqHLMzNxJYpJgW
+          9. YzBfCLzMjHqLPRw
+          10. ZVYKzNfQxRBMLaP
+          11. RqCwJXzEPLMqRkB
+          12. LpJzFQxMnJjKzCZ
+          13. ZTqCJzLwFMPxBfN
+          14. dHSRLxJYpJhCzVB
+          15. WmJxZKuNfSxLQzV
+          16. AxRDzVwFPnQkMzB
+          17. CxJkLsGzBrHcNqF
+          18. LPnJzFtRZwCkTyM
+          19. jLgVxJYpCqFwTWU
+          20. KzNRxCbWBzHjRfP
+          21. TzJxLsZKuMnJzG
+          22. ByRCLxJYpJmLzQs
+          23. NzBfCxMnJzFwLQz
+          24. JzXuMnJzFwLPqFx
+          25. RxJYpJmLCzVBgFW
+          26. PkJKzNrCLxJYpJM
+          27. YzBXzBRwPmJzTQs
+          28. xJKzNpJYDWiUsCZ
+          29. CzFPnQkMzBxJKzN
+          30. PnJzFwLPqFXzBfC
+          EOF
+          )
+          echo "Letter<<EOF" >> $GITHUB_ENV
+          echo "$Letter" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
+      - name: Display string
+        run: |
+          echo "The string is: ${{ env.Letter }}"
+
+      - name: Notify Slack on Job's Success
+        if: ${{ success() }}
+        uses: wearerequired/slack-messaging-action@v1
+        with:
+          bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: gha_interns
+          payload: >-
+            {
+              "username": "Deployer",
+              "text": "${{ env.Letter }}"
+            }
