@@ -1,6 +1,12 @@
 name: Process File and Notify Slack with Bot Token
 
-on: [push]
+on: 
+    workflow_dispatch:
+        inputs:
+            filename:
+              description: 'Enter the name of the file'
+              required: true
+              default: 'rand.txt'
 
 jobs:
   echo-file-content:
@@ -13,39 +19,7 @@ jobs:
       - name: Echo file content
         id: my_Letter
         run: |
-          Letter=$(cat <<EOF
-          1. JKezNpJYDWiUsCZ
-          2. NyMPzTBgWCKmULa
-          3. LQsZjHxJYpJmLCW
-          4. BKrEYxRjHmLQpVG
-          5. CqFmUzBVjHxLpQs
-          6. TBAxDzFWJKyLpMU
-          7. MLzBTfVzWNqLAZx
-          8. kDqHLMzNxJYpJgW
-          9. YzBfCLzMjHqLPRw
-          10. ZVYKzNfQxRBMLaP
-          11. RqCwJXzEPLMqRkB
-          12. LpJzFQxMnJjKzCZ
-          13. ZTqCJzLwFMPxBfN
-          14. dHSRLxJYpJhCzVB
-          15. WmJxZKuNfSxLQzV
-          16. AxRDzVwFPnQkMzB
-          17. CxJkLsGzBrHcNqF
-          18. LPnJzFtRZwCkTyM
-          19. jLgVxJYpCqFwTWU
-          20. KzNRxCbWBzHjRfP
-          21. TzJxLsZKuMnJzG
-          22. ByRCLxJYpJmLzQs
-          23. NzBfCxMnJzFwLQz
-          24. JzXuMnJzFwLPqFx
-          25. RxJYpJmLCzVBgFW
-          26. PkJKzNrCLxJYpJM
-          27. YzBXzBRwPmJzTQs
-          28. xJKzNpJYDWiUsCZ
-          29. CzFPnQkMzBxJKzN
-          30. PnJzFwLPqFXzBfC
-          EOF
-          )
+          Letter=$(cat "${{ github.event.inputs.filename }}")
           echo "Letter<<EOF" >> $GITHUB_ENV
           echo "$Letter" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
