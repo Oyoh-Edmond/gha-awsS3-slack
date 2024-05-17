@@ -1,12 +1,6 @@
 name: Process File and Notify Slack with Bot Token
 
-on:
-  workflow_dispatch:
-    inputs:
-      filename:
-        description: 'Enter the name of the file'
-        required: true
-        default: 'rand.txt'
+on: [push]
 
 jobs:
 
@@ -20,9 +14,48 @@ jobs:
      - name: Echo file content
        id: echofile
        run: |
-            content=$(cat ${{ github.event.inputs.filename }})
-            echo "$content" >> $GITHUB_ENV
-            id: my_content    
+            Letter=$(cat << EOF 
+            1. JKezNpJYDWiUsCZ
+            2. NyMPzTBgWCKmULa
+            3. LQsZjHxJYpJmLCW
+            4. BKrEYxRjHmLQpVG
+            5. CqFmUzBVjHxLpQs
+            6. TBAxDzFWJKyLpMU
+            7. MLzBTfVzWNqLAZx
+            8. kDqHLMzNxJYpJgW
+            9. YzBfCLzMjHqLPRw
+            10. ZVYKzNfQxRBMLaP
+            11. RqCwJXzEPLMqRkB
+            12. LpJzFQxMnJjKzCZ
+            13. ZTqCJzLwFMPxBfN
+            14. dHSRLxJYpJhCzVB
+            15. WmJxZKuNfSxLQzV
+            16. AxRDzVwFPnQkMzB
+            17. CxJkLsGzBrHcNqF
+            18. LPnJzFtRZwCkTyM
+            19. jLgVxJYpCqFwTWU
+            20. KzNRxCbWBzHjRfP
+            21. TzJxLsZKuMnJzG
+            22. ByRCLxJYpJmLzQs
+            23. NzBfCxMnJzFwLQz
+            24. JzXuMnJzFwLPqFx
+            25. RxJYpJmLCzVBgFW
+            26. PkJKzNrCLxJYpJM
+            27. YzBXzBRwPmJzTQs
+            28. xJKzNpJYDWiUsCZ
+            29. CzFPnQkMzBxJKzN
+            30. PnJzFwLPqFXzBfC
+            EOF
+            )   
+            echo "Letter<<EOF" >> $GITHUB_ENV
+            echo "$Letter" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV    
+        id: my_string
+     - name: display string
+       run: |
+       echo "The string is: ${{ env.Letter }}"
+    
+            
      - name: display string
        run: |
           echo "Item: ${{ env.content }}"
@@ -37,35 +70,7 @@ jobs:
                   {
                    
                     "username": "Deployer",
-                    "text":"${{env.content}}"
+                    "text":"${{env.Letter}}"
                   }
        
 
-  process-file:
-    runs-on: ubuntu-latest
-    needs: echo-file-content
-    outputs:
-      file-content: ${{ steps.readfile.outputs.content }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Read and echo file content
-        id: readfile
-        run: |
-          content=$(awk '{print "\""$0"\""}' ${{ github.event.inputs.filename }} | paste -sd, -)
-          echo "{\"item\":[$content]}" > codes.json
-          echo "::set-output name=content::$(cat codes.json)"
-
-      - name: Notify Slack on Job's Success
-        if: ${{ success() }}
-        uses: wearerequired/slack-messaging-action@v1
-        with:
-            bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-            channel: gha_interns 
-            payload: >-
-              {
-               
-                "username": "Deployer",
-                "text":"${{ needs.process-file.outputs.file-content }}"
-              }
