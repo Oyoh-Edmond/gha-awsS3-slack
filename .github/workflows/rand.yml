@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       file-content: ${{ steps.echofile.outputs.content }}
+
     steps:
      - name: Checkout repository
        uses: actions/checkout@v2
@@ -22,8 +23,21 @@ jobs:
        id: echofile
        run: |
             content=$(cat ${{ github.event.inputs.filename }})
-            echo "$content"
             echo "::set-output name=content::$content"  
+
+     - name: Notify Slack on Job's Success
+       if: ${{ success() }}
+       uses: wearerequired/slack-messaging-action@v1
+       with:
+                bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
+                channel: gha_interns 
+                payload: >-
+                  {
+                   
+                    "username": "Deployer",
+                    "text":"${{steps.echofile.outputs.content}}"
+                  }
+       
 
   process-file:
     runs-on: ubuntu-latest
