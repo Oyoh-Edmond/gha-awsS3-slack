@@ -1,4 +1,4 @@
-name: Process User-Input File
+name: Process File and Notify Slack with Bot Token
 
 on:
   workflow_dispatch:
@@ -11,12 +11,36 @@ on:
 jobs:
   process-file:
     runs-on: ubuntu-latest
+    outputs:
+      file-content: ${{ steps.readfile.outputs.content }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Read and echo file content
+        id: readfile
         run: |
-          filename=${{ github.event.inputs.filename }}
-          content=$(cat $filename)
-          echo "$content"
+          content=$(cat ${{ github.event.inputs.filename }})
+          echo "::set-output name=content::$content"
+
+  notify-slack:
+    runs-on: ubuntu-latest
+    needs: process-file
+    if: always()
+    steps:
+      - name: Send notification to Slack
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+           # For posting a rich message using Block Kit
+            payload: |
+                {
+                "text": "GitHub Action build result: ${{ job.status }}
+                "blocks": [
+                    {
+                    "type": "section",
+                    "text": "File processed: ${{ needs.process-file.outputs.file-content }}"
+                    }
+                ]
+                }
+        env:
+         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
