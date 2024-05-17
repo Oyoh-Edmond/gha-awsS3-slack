@@ -60,7 +60,7 @@ jobs:
         with:
           bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
           channel: gha_interns     
-          payload: | 
+          payload: >-
             {
                 "username": "deployer",
                 "text": "${{env.Letter}}"
