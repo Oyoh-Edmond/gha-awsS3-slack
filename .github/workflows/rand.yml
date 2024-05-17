@@ -37,6 +37,6 @@ jobs:
           payload: >-
             {
                 "username": "deployer",
-                "text": "edmond"
+                "text": "${{env.Letter}}"
             }
             
