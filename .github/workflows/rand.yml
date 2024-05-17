@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Echo file content
-        id: my_string
+        id: my_Letter
         run: |
           Letter=$(cat <<EOF
           1. JKezNpJYDWiUsCZ
@@ -52,16 +52,16 @@ jobs:
 
       - name: Display string
         run: |
-          echo "The string is: ${{ env.Letter }}"
+          echo "${{ env.Letter }}"
 
       - name: Notify Slack on Job's Success
         if: ${{ success() }}
         uses: wearerequired/slack-messaging-action@v1
         with:
           bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channel: gha_interns
-          payload: >-
+          channel: gha_interns     
+          payload: | 
             {
-              "username": "Deployer",
-              "text": "${{ env.Letter }}"
+                "text": "${{env.Letter}}"
             }
+            
