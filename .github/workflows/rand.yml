@@ -1,26 +1,22 @@
-name: Random numbers
+name: Process User-Input File
 
 on:
   workflow_dispatch:
     inputs:
       filename:
-        description: 'File to display'
+        description: 'Enter the name of the file'
         required: true
         default: 'rand.txt'
 
 jobs:
-  echo_file:
+  process-file:
     runs-on: ubuntu-latest
-    outputs:
-      file_content: ${{ steps.set_var.outputs.file_content }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Read file contents
-      id: read_file
-      run: echo "file_content=$(cat ${{ github.event.inputs.filename }})" >> $GITHUB_ENV
-
-    - name: Set variable
-      id: set_var
-      run: echo "::set-output name=file_content::$(echo $file_content)"
+      - name: Read and echo file content
+        run: |
+          filename=${{ github.event.inputs.filename }}
+          content=$(cat $filename)
+          echo "$content"
