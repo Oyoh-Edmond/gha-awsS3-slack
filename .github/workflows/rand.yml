@@ -62,6 +62,7 @@ jobs:
           channel: gha_interns     
           payload: | 
             {
+                "username": "deployer",
                 "text": "${{env.Letter}}"
             }
             
