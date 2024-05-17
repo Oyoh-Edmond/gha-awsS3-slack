@@ -12,8 +12,6 @@ jobs:
 
   echo-file-content:
     runs-on: ubuntu-latest
-    # outputs:
-    #   file-content: ${{ steps.echofile.outputs.content }}
 
     steps:
      - name: Checkout repository
@@ -23,9 +21,12 @@ jobs:
        id: echofile
        run: |
             content=$(cat ${{ github.event.inputs.filename }})
-            
-            echo $content
-
+            echo "$content" >> $GITHUB_ENV
+            id: my_content    
+     - name: display string
+       run: |
+          echo "Item: ${{ env.content }}"
+        
      - name: Notify Slack on Job's Success
        if: ${{ success() }}
        uses: wearerequired/slack-messaging-action@v1
@@ -36,7 +37,7 @@ jobs:
                   {
                    
                     "username": "Deployer",
-                    "text":"$content"
+                    "text":"${{env.content}}"
                   }
        
 
