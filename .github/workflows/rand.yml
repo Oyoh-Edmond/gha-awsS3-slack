@@ -22,7 +22,7 @@ jobs:
           Letter=$(cat "${{ github.event.inputs.filename }}")
           echo "Letter<<EOF" >> $GITHUB_ENV
           echo "$Letter" >> $GITHUB_ENV
-        #   echo "EOF" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Display string
         run: |
