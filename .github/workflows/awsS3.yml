@@ -36,6 +36,6 @@ jobs:
             payload: >-
               {
                   "username": "deployer",
-                  "text": File URL: https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}"
+                  "text": "File URL: https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}"
               }
               
