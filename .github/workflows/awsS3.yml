@@ -1,4 +1,4 @@
-name: Process File and Notify Slack with Bot Token
+name: Upload to S3 and Notify Slack with Bot Token The Public S3 Bucket URL
 
 on: 
     workflow_dispatch:
@@ -26,6 +26,16 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
 
-      - name: Print S3 URL
-        run: | 
-            echo "File URL: https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}"
+      
+      - name: Notify Slack on Job's Success
+        if: ${{ success() }}
+        uses: wearerequired/slack-messaging-action@v1
+        with:
+            bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
+            channel: gha_interns     
+            payload: >-
+              {
+                  "username": "deployer",
+                  "text": File URL: https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}"
+              }
+              
