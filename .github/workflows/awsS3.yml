@@ -16,7 +16,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - uses: keithweaver/aws-s3-github-action@v1.0.0
+      - name: Upload file to S3
+        uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
           source: ${{ github.event.inputs.filename }}
@@ -24,3 +25,7 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+
+      - name: Print S3 URL
+        run: | 
+            echo "File URL: https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}"
