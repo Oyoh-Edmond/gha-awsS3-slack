@@ -1,0 +1,26 @@
+name: Process File and Notify Slack with Bot Token
+
+on: 
+    workflow_dispatch:
+        inputs:
+            filename:
+              description: 'Enter the name of the file'
+              required: true
+              default: 'rand.txt'
+
+jobs:
+  echo-file-content:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - uses: keithweaver/aws-s3-github-action@v1.0.0
+        with:
+          command: cp
+          source: ${{ github.event.inputs.filename }}
+          destination: s3://gha-s3-eddy/
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
