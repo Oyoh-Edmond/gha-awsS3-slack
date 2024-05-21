@@ -35,8 +35,7 @@ jobs:
             channel: gha_interns     
             payload: >-
               {
-                  "username": "deployer",
-                  "text": 
+                  "username": "deployer", 
                   "attachments": [
                     {
                         "author_name": "${{ github.event.workflow_job.runner_name }}",
