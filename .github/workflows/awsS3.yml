@@ -43,7 +43,7 @@ jobs:
                         "fields": [
                             {
                               "title": "Link to S3 bucket",
-                              "value": "File URL: https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}",
+                              "value": "File URL: www.amazon.com",
                               "short": false
                             }
                           ],
