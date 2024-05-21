@@ -1,12 +1,12 @@
-name: Upload to S3 and Notify Slack with Bot Token The Public S3 Bucket URL
+name: Upload to S3 and Notify Slack
 
-on: 
-    workflow_dispatch:
-        inputs:
-            filename:
-              description: 'Enter the name of the file'
-              required: true
-              default: 'rand.txt'
+on:
+  workflow_dispatch:
+    inputs:
+      filename:
+        description: 'Enter the name of the file'
+        required: true
+        default: 'rand.txt'
 
 jobs:
   echo-file-content:
@@ -26,30 +26,27 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
 
-      
       - name: Notify Slack on Job's Success
         if: ${{ success() }}
         uses: wearerequired/slack-messaging-action@v1
         with:
-            bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
-            channel: gha_interns     
-            payload: >-
-              {
-                  "username": "deployer", 
-                  "attachments": 
+          bot_token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel: gha_interns
+          payload: >
+            {
+              "username": "deployer",
+              "text": "Job Successful\nFile URL: https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}",
+              "attachments": [
+                {
+                  "author_name": "${{ github.event.workflow_job.runner_name }}",
+                  "fields": [
                     {
-                        "author_name": "${{ github.event.workflow_job.runner_name }}",
-                        "pretext": "Job Successful",
-                        "fields": [
-                            {
-                                "title": "Link to S3 bucket",
-                                "value": "File URL: [https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}",
-                                "text": "This is a link to the file uploaded to the S3 bucket."
-                            }
-                        ],
-                        "footer": "<https://github.com/${{ github.repository }}|${{ github.repository }}>"
+                      "title": "Link to S3 bucket",
+                      "value": "<https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}|File URL>",
+                      "short": false
                     }
-                ]
-               }
-              }
-              
+                  ],
+                  "footer": "<https://github.com/${{ github.repository }}|${{ github.repository }}>"
+                }
+              ]
+            }
