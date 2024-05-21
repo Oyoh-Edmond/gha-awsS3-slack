@@ -16,6 +16,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Read file content
+        id: read_file
+        run: |
+          content=$(cat ${{ github.event.inputs.filename }})
+          echo "::set-output name=content::${content}"
+
       - name: Upload file to S3
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
@@ -35,11 +41,17 @@ jobs:
           payload: >
             {
               "username": "deployer",
-              "text": "Job Successful\nFile URL: https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}",
+              "text": "Job Successful",
               "attachments": [
                 {
                   "author_name": "${{ github.event.workflow_job.runner_name }}",
+                  "pretext": "File successfully uploaded to S3.",
                   "fields": [
+                    {
+                      "title": "File Content Preview",
+                      "value": "${{ steps.read_file.outputs.content }}",
+                      "short": false
+                    },
                     {
                       "title": "Link to S3 bucket",
                       "value": "<https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}|File URL>",
