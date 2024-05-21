@@ -36,6 +36,20 @@ jobs:
             payload: >-
               {
                   "username": "deployer",
-                  "text": "File URL: https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}"
+                  "text": 
+                  "attachments": [
+                    {
+                        "author_name": "${{ github.event.workflow_job.runner_name }}",
+                        "pretext": "Job Successful",
+                        "fields": [
+                            {
+                              "title": "Link to S3 bucket",
+                              "value": "File URL: https://gha-s3-eddy.s3.us-east-1.amazonaws.com/${{ github.event.inputs.filename }}",
+                              "short": true
+                            }
+                          ],
+                        "footer": "<https://github.com/${{ github.repository }}|${{ github.repository }}>"
+                    }
+                  ]
               }
               
